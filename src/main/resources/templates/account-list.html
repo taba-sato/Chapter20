@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter20:アカウントDAOクラスをインタフェースに変更</title>
+  <!--/* 外部スタイルシートの適用 */-->
+  <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+</head>
+<body>
+ <h2>アカウント一覧</h2>
+ <!--/* アカウントの新規作成 */-->
+ <a th:href="@{/account/create}"><button type="button">新規作成</button></a>
+ <a th:href="@{/home}"><button type="button">戻る</button></a>
+ <!--/* アカウントの一覧を表示 */-->
+ <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Password</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!--/* eachで繰返し出力 */-->
+      <tr th:each="account : ${accountList}">
+        <td>
+          <!--/* ID番号でリンク */-->
+          <a th:href="@{/account/__${account.id}__}" th:text="${account.id}"></a>
+        </td>        
+        <td th:text="${account.email}"></td>
+        <td th:text="${account.password}"></td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

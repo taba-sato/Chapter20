@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter20:アカウントDAOクラスをインタフェースに変更</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+</head>
+<body>
+  <h2>新規作成</h2>
+  <!--/* アカウントの新規作成と登録 */-->
+  <form method="post" th:object="${accountDto}">
+    <div>
+      <button type="submit" th:formaction="@{/account/register}">登録</button>
+      <button type="submit" th:formaction="@{/account/cancel}">キャンセル</button>
+    </div>
+    <div>
+      <label for="email">Email</label>
+      <input type="text" name="email" th:value="*{email}" />
+      <!--/* エラーメッセージの出力 */-->
+      <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" th:errorclass="validation-error">
+    </div>
+    <div>
+      <label for="password">Password</label>
+      <input type="text" name="password" th:value="*{password}" />
+      <!--/* エラーメッセージの出力 */-->
+      <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" th:errorclass="validation-error">
+    </div>
+  </form>
+</body>
+</html>

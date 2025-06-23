@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter20:アカウントDAOクラスをインタフェースに変更</title>
+  <!--/* 外部スタイルシートの適用 */-->
+  <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+</head>
+<body>
+  <h2>ログイン</h2>
+  <!--/* 赤でエラーメッセージ */-->
+  <p class="validation-error">[[${mesg}]]</p>
+  <!--/* POSTメソッドでポストデータ送信 */-->
+
+  <!--  <form th:action="@{/login}" method="post" th:object="${user}">-->
+<!--    <div><input type="text" name="email" th:value="*{email}" placeholder="メールアドレス"/></div>-->
+<!--    <div><input type="password" name="password" th:value="*{password}" placeholder="パスワード"/></div>-->
+<!--    <div><button type="submit">ログイン</button></div>-->
+<!--  </form>-->
+
+	<form th:action="@{/login}" method="post">
+	  <div><input type="text" name="username" placeholder="メールアドレス"/></div>
+	  <div><input type="password" name="password" placeholder="パスワード"/></div>
+	  <div><button type="submit">ログイン</button></div>
+	</form>
+	
+</body>
+</html>

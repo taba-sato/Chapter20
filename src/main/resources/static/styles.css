@@ -1,0 +1,110 @@
+@charset "UTF-8"; /* 文字エンコーディングをUTF-8に指定 */
+@import url('https://fonts.googleapis.com/css2?family=Klee+One&display=swap'); /* Google Fontsから'Klee One'フォントをインポート */
+
+/* ベースのフォント設定 */
+body {
+  font-family: 'Klee One', cursive;
+}
+
+/* div要素の基本スタイル */
+div {
+  width: 80%; /* 幅を設定 */
+  text-align: left; /* テキストを左揃えに */
+  color: #353535; /* 濃いグレーのテキスト色を指定 */
+}
+
+/* エラーメッセージのスタイル */
+.validation-error {
+  color: red; /* 赤色でエラーメッセージを強調 */
+}
+
+/* テーブルのスタイル設定 */
+table {
+  width: 80%; /* 幅を80%に設定 */
+  border-collapse: collapse; /* 境界線の表示スタイルを設定 */
+  text-align: left; /* テキストを左揃えに */
+  color: #353535; /* 濃いグレーのテキスト色を指定 */
+}
+
+/* テーブルセルのスタイリング */
+table th, table td {
+  padding: 10px; /* パディングを設定 */
+  border: 1px solid #ccc; /* 薄いグレーの境界線を設定 */
+}
+
+/* テーブル行のスタイリング */
+table tr {
+  border-bottom: solid 1px #eee; /* 非常に薄いグレーの下境界線を設定 */
+}
+
+/* テーブル行のホバー効果 */
+table tr:hover {
+  background-color: #d4f0fd; /* 淡い青の背景色を設定（ホバー時） */
+}
+
+/* テーブルヘッダーのスタイリング */
+table thead {
+  background: #EFD7D3; /* 淡いピンクの背景色を設定 */
+}
+
+/* 見出しh2のスタイリング */
+h2 {
+  font-size: 24px; /* フォントサイズを設定 */
+  border-bottom: solid; /* 下線を追加 */
+  padding-bottom: 5px; /* 下部パディングを設定 */
+  margin-bottom: 15px; /* 下部マージンを設定 */
+}
+
+/* 本文のパラグラフスタイル */
+p {
+  font-size: 16px; /* フォントサイズを設定 */
+  line-height: 1.6; /* 行の高さを設定 */
+}
+
+/* ボタンの基本スタイル */
+button {
+  font-family: 'Klee One', cursive; /* フォントを設定 */
+  display: inline-block; /* 表示スタイルを設定 */
+  padding: 5px 10px; /* パディングを設定 */
+  font-size: 16px; /* フォントサイズを設定 */
+  text-align: center; /* テキストを中央揃えに */
+  cursor: pointer; /* カーソルスタイルを設定 */
+  text-decoration: none; /* テキスト装飾を無効化 */
+  outline: none; /* アウトラインを非表示に */
+  color: #fff; /* 白色のテキスト色を設定 */
+  background-color: #007BFF; /* 明るい青色の背景色を設定 */
+  border: none; /* 境界線を非表示に */
+  border-radius: 8px; /* 境界の丸みを設定 */
+  box-shadow: 0 6px #999; /* 中間灰色の影を設定 */
+  margin-bottom: 10px; /* 下部マージンを設定 */
+}
+
+/* ボタンのホバー時スタイル */
+button:hover {
+  background-color: #0056b3; /* 濃い青色の背景色を設定（ホバー時） */
+}
+
+/* ボタンのアクティブ（押下時）スタイル */
+button:active {
+  background-color: #0056b3; /* 濃い青色の背景色を設定（アクティブ時） */
+  box-shadow: 0 5px #666; /* 濃い灰色の影を設定（アクティブ時） */
+  transform: translateY(3px); /* 位置を下に移動（アクティブ時） */
+}
+
+/* テキスト入力フィールドのスタイル */
+input[type="text"], input[type="email"], input[type="password"] {
+  font-family: 'Klee One', cursive; /* フォントを設定 */
+  display: block; /* 表示スタイルを設定 */
+  width: 80%; /* 幅を設定 */
+  height: calc(1.5em + .75rem + 2px); /* 高さを計算で設定 */
+  padding: .375rem .75rem; /* パディングを設定 */
+  font-size: 1rem; /* フォントサイズを設定 */
+  font-weight: 400; /* フォントの太さを設定 */
+  line-height: 1.5; /* 行の高さを設定 */
+  color: #495057; /* 濃い灰色のテキスト色を設定 */
+  background-color: #fff; /* 白色の背景色を設定 */
+  background-clip: padding-box; /* 背景のクリップを設定 */
+  border: 1px solid #ced4da; /* 淡い灰色の境界線を設定 */
+  border-radius: .25rem; /* 境界の丸みを設定 */
+  margin-bottom: 10px; /* 下部マージンを設定 */
+}
