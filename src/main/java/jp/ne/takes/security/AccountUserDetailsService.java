@@ -11,11 +11,9 @@ import lombok.RequiredArgsConstructor;
 /**
  * Spring Security の UserDetailsService 実装クラス。
  * 
- * 
  * ログイン時に入力されたメールアドレスをもとに、
  * アカウント情報（AccountDto）をデータベースから取得し、
  * {@link AccountPrincipal} にラップして返す。
- * 
  * 
  * 
  * 本クラスは {@link org.springframework.security.authentication.dao.DaoAuthenticationProvider}
