@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
  * から呼び出され、ログイン認証の対象となるユーザー情報を提供する。
  * 
  * 
- * @author TAKES Co., Ltd.
  */
 @Service
 @RequiredArgsConstructor
