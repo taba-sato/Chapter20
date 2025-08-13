@@ -35,14 +35,14 @@ public class SecurityConfig {
   @Bean
   // SecurityFilterChain セキュリティルール（認可・ログイン・ログアウトなど）を定義
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {  
-    http // パスへのアクセス制御を行う
-      .authorizeHttpRequests(auth -> auth
+    http 
+      .authorizeHttpRequests(auth -> auth // パスへのアクセス制御を行う
        // ログイン画面やCSSなどは誰でもアクセス可
           .requestMatchers("/", "/login", "/styles.css").permitAll()
           // その他すべてのURLは認証が必要
           .anyRequest().authenticated()
       )
-      .formLogin(login -> login
+      .formLogin(login -> login //ログイン画面設定
           // ログイン画面のパス（GET）
           .loginPage("/")
           // ログイン処理を行うパス（POST）
@@ -65,18 +65,19 @@ public class SecurityConfig {
   return http.build();
 }
 
-/**
-* 開発中の暫定パスワードエンコーダ（平文で処理）。
-* 
-* 本番環境では必ず BCryptPasswordEncoder などに切り替えること。
-* 
-* @return NoOpPasswordEncoderのインスタンス
-*/
-@SuppressWarnings("deprecation")
-@Bean
-public NoOpPasswordEncoder passwordEncoder() {
-  return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
-}
+  /**
+  * 開発中の暫定パスワードエンコーダ（平文で処理）。
+  * 
+  * 本番環境では必ず BCryptPasswordEncoder などに切り替えること。
+  * 
+  * @return NoOpPasswordEncoderのインスタンス
+  */
+  @SuppressWarnings("deprecation")
+  @Bean
+  public NoOpPasswordEncoder passwordEncoder() {
+    return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
+  }
+
 
 /**
 * 認証プロバイダの定義。
@@ -87,9 +88,9 @@ public NoOpPasswordEncoder passwordEncoder() {
 */
 @Bean
 public DaoAuthenticationProvider authProvider() {
-  var provider = new DaoAuthenticationProvider();
-  provider.setUserDetailsService(userDetailsService);
-  provider.setPasswordEncoder(passwordEncoder());
-  return provider;
+  var provider = new DaoAuthenticationProvider(); // 認証プロバイダーを作る
+  provider.setUserDetailsService(userDetailsService); // ユーザー情報の取得方法を設定
+  provider.setPasswordEncoder(passwordEncoder()); // パスワードの照合方法を設定
+  return provider;  // Spring に登録
  }
 }
