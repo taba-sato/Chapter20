@@ -11,15 +11,12 @@
   <h2>ログイン</h2>
   <!--/* 赤でエラーメッセージ */-->
   <p class="validation-error">[[${mesg}]]</p>
-  <!--/* POSTメソッドでポストデータ送信 */-->
-
-  <!--  <form th:action="@{/login}" method="post" th:object="${user}">-->
-<!--    <div><input type="text" name="email" th:value="*{email}" placeholder="メールアドレス"/></div>-->
-<!--    <div><input type="password" name="password" th:value="*{password}" placeholder="パスワード"/></div>-->
-<!--    <div><button type="submit">ログイン</button></div>-->
-<!--  </form>-->
-
 	<form th:action="@{/login}" method="post">
+<!--	  <p th:if="${session['SPRING_SECURITY_LAST_EXCEPTION']} !=null"-->
+<!--		th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}"-->
+<!--		>-->
+<!--	  ログインエラーメッセージ-->
+<!--	  </p>-->
 	  <div><input type="text" name="username" placeholder="メールアドレス"/></div>
 	  <div><input type="password" name="password" placeholder="パスワード"/></div>
 	  <div><button type="submit">ログイン</button></div>

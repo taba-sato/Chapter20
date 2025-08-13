@@ -5,7 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import jp.ne.takes.security.AccountUserDetailsService;
@@ -35,14 +36,14 @@ public class SecurityConfig {
   @Bean
   // SecurityFilterChain セキュリティルール（認可・ログイン・ログアウトなど）を定義
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {  
-    http // パスへのアクセス制御を行う
-      .authorizeHttpRequests(auth -> auth
+    http 
+      .authorizeHttpRequests(auth -> auth // パスへのアクセス制御を行う
        // ログイン画面やCSSなどは誰でもアクセス可
           .requestMatchers("/", "/login", "/styles.css").permitAll()
           // その他すべてのURLは認証が必要
           .anyRequest().authenticated()
       )
-      .formLogin(login -> login
+      .formLogin(login -> login //ログイン画面設定
           // ログイン画面のパス（GET）
           .loginPage("/")
           // ログイン処理を行うパス（POST）
@@ -72,11 +73,12 @@ public class SecurityConfig {
 * 
 * @return NoOpPasswordEncoderのインスタンス
 */
-@SuppressWarnings("deprecation")
-@Bean
-public NoOpPasswordEncoder passwordEncoder() {
-  return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
-}
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+      // {bcrypt}, {noop}, {pbkdf2}…のプレフィックスに応じて自動で照合
+      return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+  }
+
 
 /**
 * 認証プロバイダの定義。
@@ -87,9 +89,9 @@ public NoOpPasswordEncoder passwordEncoder() {
 */
 @Bean
 public DaoAuthenticationProvider authProvider() {
-  var provider = new DaoAuthenticationProvider();
-  provider.setUserDetailsService(userDetailsService);
-  provider.setPasswordEncoder(passwordEncoder());
-  return provider;
+  var provider = new DaoAuthenticationProvider(); // 認証プロバイダーを作る
+  provider.setUserDetailsService(userDetailsService); // ユーザー情報の取得方法を設定
+  provider.setPasswordEncoder(passwordEncoder()); // パスワードの照合方法を設定
+  return provider;  // Spring に登録
  }
 }

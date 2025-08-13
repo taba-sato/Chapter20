@@ -3,11 +3,12 @@ package jp.ne.takes.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 
 import jp.ne.takes.dao.AccountDao;
 import jp.ne.takes.dto.AccountDto;
@@ -33,6 +34,9 @@ public class AccountService {
   @Qualifier("AccountDaoFeatJpaRepository")
   private final AccountDao dao;
 
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+  
   /**
    * ログインの検証
    * 
@@ -133,6 +137,8 @@ public class AccountService {
     if(result.hasFieldErrors("password")) {
       return false;
     }
+    // パスワードを暗号化して上書き
+    account.setPassword(passwordEncoder.encode(account.getPassword()));
     // アカウントを作成
     dao.create(account);
     return true;
