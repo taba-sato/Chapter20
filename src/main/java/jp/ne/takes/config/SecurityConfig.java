@@ -66,13 +66,17 @@ public class SecurityConfig {
   return http.build();
 }
 
-/**
-* 開発中の暫定パスワードエンコーダ（平文で処理）。
-* 
-* 本番環境では必ず BCryptPasswordEncoder などに切り替えること。
-* 
-* @return NoOpPasswordEncoderのインスタンス
-*/
+  /**
+   * 開発および検証用のパスワードエンコーダ。
+   * 
+   * デフォルトでは {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()} を使用し、
+   * {bcrypt}, {noop}, {pbkdf2} などのプレフィックスに応じて自動で照合を行う。
+   * 
+   * 現在は平文（{noop}）を使用して動作確認を行う想定。
+   * 本番環境では必ず {bcrypt}（BCryptPasswordEncoder）など安全なアルゴリズムに切り替えること。
+   *
+   * @return デリゲーティングパスワードエンコーダのインスタンス
+   */
   @Bean
   public PasswordEncoder passwordEncoder() {
       // {bcrypt}, {noop}, {pbkdf2}…のプレフィックスに応じて自動で照合
