@@ -52,9 +52,10 @@ public class LoginController {
    */
   @GetMapping("/")
   public String index(@RequestParam(name = "error", required = false) String error, Model model) {
-    if (error != null) {
-      model.addAttribute("mesg", "メールアドレスまたはパスワードが間違っています");
-    }
+//    if (error != null) {
+//      model.addAttribute("mesg", "メールアドレスまたはパスワードが間違っています");
+//    }
+//  login.htmlでエラー表示を実装
     return "login";
   }
   

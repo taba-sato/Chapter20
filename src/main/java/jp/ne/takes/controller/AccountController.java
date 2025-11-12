@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import jp.ne.takes.dto.AccountDto;
+import jp.ne.takes.dto.User;
 import jp.ne.takes.service.AccountService;
 import lombok.RequiredArgsConstructor;
 
@@ -119,7 +120,7 @@ public class AccountController {
   @GetMapping("/account/create")
   public String create(Model mdl) {
     // 新規アカウントを生成しモデルに設定
-    mdl.addAttribute("accountDto", new AccountDto());
+    mdl.addAttribute("user", new User());
     return "account-register";
   }
 
@@ -134,9 +135,9 @@ public class AccountController {
    *         失敗："account-register"（新規登録画面を表示）
    */
   @PostMapping("/account/register")
-  public String register(@ModelAttribute @Validated AccountDto account, BindingResult result) {
+  public String register(@ModelAttribute @Validated User user, BindingResult result) {
     // アカウントの登録
-    if(accountService.isRegisterSuccessful(account, result)) {
+    if(accountService.isRegisterSuccessful(user, result)) {
       // 成功
       return "redirect:/account/list";
     }

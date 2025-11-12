@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 
 import jp.ne.takes.dao.AccountDao;
 import jp.ne.takes.dto.AccountDto;
+import jp.ne.takes.dto.User;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -98,9 +99,9 @@ public class AccountService {
       return false;
     }
     // パスワードの入力エラーを確認
-    if(result.hasFieldErrors("password")) {
-      return false;
-    }
+//    if(result.hasFieldErrors("password")) {
+//      return false;
+//    }
     // アカウント情報を更新
     dao.update(account);
     return true;
@@ -123,13 +124,13 @@ public class AccountService {
    * @return 成功{@code true}/失敗{@code false}
    */
   @Transactional
-  public boolean isRegisterSuccessful(AccountDto account, BindingResult result) {
+  public boolean isRegisterSuccessful(User user, BindingResult result) {
     // メアドの入力エラーを確認
     if(result.hasFieldErrors("email")) {
       return false;
     }
     // メアドが使用されていないか確認
-    if(dao.existsByEmail(account.getEmail())) {
+    if(dao.existsByEmail(user.getEmail())) {
       result.rejectValue("email", "error.email", "このメールアドレスは既に使用されています");
       return false;
     }
@@ -137,6 +138,13 @@ public class AccountService {
     if(result.hasFieldErrors("password")) {
       return false;
     }
+    //ハッシュ化
+    var encoded = passwordEncoder.encode(user.getPassword());
+
+    // 永続化用エンティティに詰め替え
+    var account = new AccountDto();
+    account.setEmail(user.getEmail());
+    account.setPassword(encoded); // ← BCrypt(60文字)
     // アカウントを作成
     dao.create(account);
     return true;

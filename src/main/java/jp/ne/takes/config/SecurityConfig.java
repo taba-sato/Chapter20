@@ -5,7 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import jp.ne.takes.security.AccountUserDetailsService;
@@ -31,6 +32,12 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
   private final AccountUserDetailsService userDetailsService;
+  
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+      // {bcrypt}, {noop}, {pbkdf2}, {scrypt} 等の接頭辞で自動判別
+      return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+  }
 
   @Bean
   // SecurityFilterChain セキュリティルール（認可・ログイン・ログアウトなど）を定義
@@ -47,6 +54,8 @@ public class SecurityConfig {
           .loginPage("/")
           // ログイン処理を行うパス（POST）
           .loginProcessingUrl("/login")
+          .usernameParameter("username")
+          .passwordParameter("password")
           // 認証成功後に遷移するページ
           .defaultSuccessUrl("/home", true)
           // 認証失敗時に遷移するURL
@@ -65,18 +74,18 @@ public class SecurityConfig {
   return http.build();
 }
 
-  /**
-  * 開発中の暫定パスワードエンコーダ（平文で処理）。
-  * 
-  * 本番環境では必ず BCryptPasswordEncoder などに切り替えること。
-  * 
-  * @return NoOpPasswordEncoderのインスタンス
-  */
-  @SuppressWarnings("deprecation")
-  @Bean
-  public NoOpPasswordEncoder passwordEncoder() {
-    return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
-  }
+//  /**
+//  * 開発中の暫定パスワードエンコーダ（平文で処理）。
+//  * 
+//  * 本番環境では必ず BCryptPasswordEncoder などに切り替えること。
+//  * 
+//  * @return NoOpPasswordEncoderのインスタンス
+//  */
+//  @SuppressWarnings("deprecation")
+//  @Bean
+//  public NoOpPasswordEncoder passwordEncoder() {
+//    return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
+//  }
 
 
 /**

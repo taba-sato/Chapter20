@@ -11,7 +11,9 @@
     <!--/* アカウント一覧画面に遷移 */-->
     <a th:href="@{/account/list}"><button type="button">アカウント一覧</button></a>
     <!--/* ログイン画面に戻る */-->
-    <a th:href="@{/}"><button type="button">戻る</button></a>
+	<form th:action="@{/logout}" method="post" style="display:inline;">
+	  <button type="submit">ログアウト</button>
+	</form>
   </div>
   <fieldset>
     <legend>ユーザー情報と日時</legend>

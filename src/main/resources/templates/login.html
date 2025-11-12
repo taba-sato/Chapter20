@@ -9,18 +9,16 @@
 </head>
 <body>
   <h2>ログイン</h2>
-  <!--/* 赤でエラーメッセージ */-->
-  <p class="validation-error">[[${mesg}]]</p>
+  <!-- 失敗/ログアウト完了メッセージ（/?error, /?logout で表示）Spring Securityのクエリパラメータで表示 -->
+    <p class="validation-error" th:if="${param.error}">メールアドレスまたはパスワードが間違っています</p>
+    <p class="info" th:if="${param.logout}">ログアウトしました</p>
+  <!--/* 赤でエラーメッセージ ↑で実装 */--> 
+<!--  <p class="validation-error">[[${mesg}]]</p>-->
 	<form th:action="@{/login}" method="post">
-<!--	  <p th:if="${session['SPRING_SECURITY_LAST_EXCEPTION']} !=null"-->
-<!--		th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}"-->
-<!--		>-->
-<!--	  ログインエラーメッセージ-->
-<!--	  </p>-->
+	  <!-- ▼ CSRF トークン（必須） -->
 	  <div><input type="text" name="username" placeholder="メールアドレス"/></div>
 	  <div><input type="password" name="password" placeholder="パスワード"/></div>
 	  <div><button type="submit">ログイン</button></div>
 	</form>
-	
 </body>
 </html>

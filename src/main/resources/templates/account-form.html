@@ -9,6 +9,9 @@
   <h2>更新・削除</h2>
   <!--/* アカウントの更新・削除画面 */-->
   <form method="post" th:object="${accountDto}">
+	<!-- ▼ CSRF トークン -->
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+		
     <div>
       <button type="submit" th:formaction="@{/account/update}">更新</button>
       <button type="submit" th:formaction="@{/account/delete}">削除</button>
@@ -24,12 +27,12 @@
       <!--/* エラーメッセージの出力 */-->
       <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" th:errorclass="validation-error">
     </div>
-    <div>
-      <label for="password">Password</label>
-      <input type="text" name="password" th:value="*{password}" />
-      <!--/* エラーメッセージの出力 */-->
-      <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" th:errorclass="validation-error">
-    </div>
+<!--    <div>-->
+<!--      <label for="password">Password</label>-->
+<!--      <input type="text" name="password" th:value="*{password}" />-->
+<!--      /* エラーメッセージの出力 */-->
+<!--      <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" th:errorclass="validation-error">-->
+<!--    </div>-->
   </form>
 </body>
 </html>
