@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import org.springframework.validation.BindingResult;
 
 import jp.ne.takes.dao.AccountDao;
 import jp.ne.takes.dto.AccountDto;
+import jp.ne.takes.dto.PasswordChangeForm;
 import jp.ne.takes.dto.User;
 import lombok.RequiredArgsConstructor;
 
@@ -93,17 +96,83 @@ public class AccountService {
     if(result.hasFieldErrors("email")) {
       return false;
     }
+    
+    // 2) ログイン中ユーザー（メール）を取得
+    // SecurityContextHolder -> いまのリクエストを処理しているスレッドに紐づく“認証情報（だれがログイン中か）”の置き場所
+    //  Spring Security がログイン成功時にここへ Authentication を入れ、各層（Controller/Service 等）から取り出せる
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String loginEmail = (auth != null ? auth.getName() : null);
+
+    // 3) 更新対象の現行レコードをDBから再取得
+    var currentOpt = dao.findById(account.getId());
+    if (currentOpt.isEmpty()) {
+      result.reject("notfound", "対象アカウントが存在しません");
+      return false;
+    }
+    var current = currentOpt.get();
+
+    // 4) 本人チェック：ログインメール と 現行レコードのメール が一致すること
+    if (loginEmail == null || !loginEmail.equals(current.getEmail())) {
+      result.reject("forbidden", "自分のアカウントのみ更新できます");
+      return false;
+    }
+    
     // メアドが自身以外で使用されていないか確認
     if(dao.existsByEmailAndIdNot(account.getEmail(), account.getId())) {
       result.rejectValue("email", "error.email", "このメールアドレスは既に使用されています");
       return false;
     }
+    
+    // 6) パスワードは温存（UIから消した場合でも上書き破壊しない）
+    account.setPassword(current.getPassword());
     // パスワードの入力エラーを確認
 //    if(result.hasFieldErrors("password")) {
 //      return false;
 //    }
     // アカウント情報を更新
     dao.update(account);
+    return true;
+  }
+  
+  /**
+   * パスワードの更新
+   * 
+   * @param email 更新するアカウントのemail
+   * @param form  フォームで入力されたパスワード
+   * @param result バリデーションの結果
+   * @return 成功{@code true}/失敗{@code false}
+   */
+  @Transactional
+  public boolean changeOwnPassword(String email,
+                                   PasswordChangeForm form,
+                                   BindingResult result) {
+    // 1) 本人のレコードを取得
+    var accountOpt = dao.findByEmail(email);
+    if (accountOpt.isEmpty()) {
+      result.reject("notfound", "アカウントが見つかりません");
+      return false;
+    }
+    var account = accountOpt.get();
+
+    // 2) 現在パスワードの一致チェック（{bcrypt}/{noop} いずれでも matches が面倒見ます）
+    if (!passwordEncoder.matches(form.getCurrentPassword(), account.getPassword())) {
+      result.rejectValue("currentPassword", "mismatch.current", "現在のパスワードが正しくありません");
+      return false;
+    }
+
+    // 3) 新パスワード一致＆差分チェック
+    if (!form.getNewPassword().equals(form.getConfirmPassword())) {
+      result.rejectValue("confirmPassword", "mismatch.confirm", "確認用パスワードが一致しません");
+      return false;
+    }
+    if (passwordEncoder.matches(form.getNewPassword(), account.getPassword())) {
+      result.rejectValue("newPassword", "same.as.old", "現在のパスワードと同一です");
+      return false;
+    }
+
+    // 4) ハッシュ化して保存
+    account.setPassword(passwordEncoder.encode(form.getNewPassword()));
+    dao.update(account); 
     return true;
   }
 

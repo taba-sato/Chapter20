@@ -9,7 +9,9 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import jp.ne.takes.repository.AccountRepository;
 import jp.ne.takes.security.AccountUserDetailsService;
+import jp.ne.takes.security.PasswordUpgradeSuccessHandler;
 import lombok.RequiredArgsConstructor;
 
 
@@ -38,10 +40,35 @@ public class SecurityConfig {
       // {bcrypt}, {noop}, {pbkdf2}, {scrypt} 等の接頭辞で自動判別
       return PasswordEncoderFactories.createDelegatingPasswordEncoder();
   }
+  
+  /**
+  * 認証プロバイダの定義。
+  * 
+  * 認証処理に使用する UserDetailsService と PasswordEncoder を指定。
+  * 
+  * @return DaoAuthenticationProviderのインスタンス
+  */
+  @Bean
+  public DaoAuthenticationProvider authProvider() {
+    var provider = new DaoAuthenticationProvider(); // 認証プロバイダーを作る
+    provider.setUserDetailsService(userDetailsService); // ユーザー情報の取得方法を設定
+    provider.setPasswordEncoder(passwordEncoder()); // パスワードの照合方法を設定
+    return provider;  // Spring に登録
+   }
 
+  // 最終的に削除
+  @Bean
+  public PasswordUpgradeSuccessHandler passwordUpgradeSuccessHandler(
+          AccountRepository accountRepository,
+          PasswordEncoder passwordEncoder) {
+      return new PasswordUpgradeSuccessHandler(accountRepository, passwordEncoder);
+  }
+  
   @Bean
   // SecurityFilterChain セキュリティルール（認可・ログイン・ログアウトなど）を定義
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {  
+  public SecurityFilterChain filterChain(
+       HttpSecurity http, 
+       PasswordUpgradeSuccessHandler passwordUpgradeSuccessHandler) throws Exception {  
     http 
       .authorizeHttpRequests(auth -> auth // パスへのアクセス制御を行う
        // ログイン画面やCSSなどは誰でもアクセス可
@@ -56,8 +83,10 @@ public class SecurityConfig {
           .loginProcessingUrl("/login")
           .usernameParameter("username")
           .passwordParameter("password")
-          // 認証成功後に遷移するページ
-          .defaultSuccessUrl("/home", true)
+       // noop→bcrypt変換用のコード。最終的に削除する
+          .successHandler(passwordUpgradeSuccessHandler)
+          // 認証成功後に遷移するページ PasswordUpgradeSuccessHandlerクラス削除後に有効にする
+          //.defaultSuccessUrl("/home", true)
           // 認証失敗時に遷移するURL
           .failureUrl("/?error")
           .permitAll()
@@ -67,9 +96,9 @@ public class SecurityConfig {
           .logoutUrl("/logout")
           // ログアウト後にリダイレクトするページ
           .logoutSuccessUrl("/")
-      )
-      // CSRF保護は一時的に無効（開発中のみ）
-      .csrf(csrf -> csrf.disable());
+          .invalidateHttpSession(true)
+          .deleteCookies("JSESSIONID")
+      );
 
   return http.build();
 }
@@ -88,18 +117,5 @@ public class SecurityConfig {
 //  }
 
 
-/**
-* 認証プロバイダの定義。
-* 
-* 認証処理に使用する UserDetailsService と PasswordEncoder を指定。
-* 
-* @return DaoAuthenticationProviderのインスタンス
-*/
-@Bean
-public DaoAuthenticationProvider authProvider() {
-  var provider = new DaoAuthenticationProvider(); // 認証プロバイダーを作る
-  provider.setUserDetailsService(userDetailsService); // ユーザー情報の取得方法を設定
-  provider.setPasswordEncoder(passwordEncoder()); // パスワードの照合方法を設定
-  return provider;  // Spring に登録
- }
+
 }

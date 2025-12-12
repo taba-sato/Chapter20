@@ -10,6 +10,8 @@
   <div>
     <!--/* アカウント一覧画面に遷移 */-->
     <a th:href="@{/account/list}"><button type="button">アカウント一覧</button></a>
+	<!--/* パスワード変更画面に遷移 */-->
+	<a th:href="@{/account/password}"><button type="button">パスワード変更</button></a>
     <!--/* ログイン画面に戻る */-->
 	<form th:action="@{/logout}" method="post" style="display:inline;">
 	  <button type="submit">ログアウト</button>

@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jp.ne.takes.dto.AccountDto;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
  * 
  * @author TAKES Co., Ltd.
  */
+@Getter
 @RequiredArgsConstructor
 public class AccountPrincipal implements UserDetails {
 

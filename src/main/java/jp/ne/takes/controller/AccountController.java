@@ -1,5 +1,6 @@
 package jp.ne.takes.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,7 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import jp.ne.takes.dto.AccountDto;
+import jp.ne.takes.dto.PasswordChangeForm;
 import jp.ne.takes.dto.User;
+import jp.ne.takes.security.AccountPrincipal;
 import jp.ne.takes.service.AccountService;
 import lombok.RequiredArgsConstructor;
 
@@ -85,13 +88,54 @@ public class AccountController {
   }
   
   /**
+   * パスワードの更新：ハンドラーメソッド
+   * URL: http://localhost:8080/account/password
+   * HTTPメソッド: GET
+   *
+   * @return "account-password"（パスワード更新画面を表示）
+   */
+  @GetMapping("/account/password")
+  public String showPasswordForm(Model mdl) {
+      mdl.addAttribute("form", new PasswordChangeForm());
+     return "account-password"; 
+  }
+
+  /**
+   * パスワードの更新：ハンドラーメソッド
+   * URL: http://localhost:8080/account/password
+   * HTTPメソッド: POST
+   *
+   * @param form 更新するパスワード情報
+   * @param result バリデーションの結果
+   * @param principal ログインしたアカウント情報
+   * @return 成功："redirect:/home"（ホーム画面を表示）
+   *         失敗："account-password"（パスワード更新画面を表示）
+   */
+  @PostMapping("/account/password")
+  public String changePassword(@ModelAttribute("form") @Validated PasswordChangeForm form,
+                              BindingResult result,
+                              @AuthenticationPrincipal AccountPrincipal principal,
+                              Model mdl) {
+    if (result.hasErrors()) {
+      mdl.addAttribute("form", form);
+      return "account-password";
+  }
+    
+     if (!accountService.changeOwnPassword(principal.getUsername(), form, result)) {
+         return "account-password";
+     }
+
+     return "redirect:/home";
+  }
+  
+  /**
    * アカウント更新のキャンセル：ハンドラーメソッド 
    * URL: http://localhost:8080/account/cancel
    * HTTPメソッド: POST
    *
    * @return "redirect:/account-list"（アカウント一覧画面を表示）
    */
-  @PostMapping("/account/cancel")
+  @GetMapping("/account/cancel")
   public String cancel() {
     // アカウント一覧にリダイレクト 
     return "redirect:/account/list";
@@ -129,7 +173,7 @@ public class AccountController {
    * URL: http://localhost:8080/account/register
    * HTTPメソッド: POST
    *
-   * @param account 登録するアカウント情報
+   * @param user 登録するアカウント情報
    * @param result バリデーションの結果
    * @return 成功："account-list"（アカウント一覧画面を表示）
    *         失敗："account-register"（新規登録画面を表示）
