@@ -3,7 +3,6 @@ package jp.ne.takes.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,8 +13,10 @@ import org.springframework.validation.BindingResult;
 
 import jp.ne.takes.dao.AccountDao;
 import jp.ne.takes.dto.AccountDto;
+import jp.ne.takes.dto.AccountDto.Role;
 import jp.ne.takes.dto.PasswordChangeForm;
 import jp.ne.takes.dto.User;
+import jp.ne.takes.security.AuthenticationRefresher;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -38,8 +39,8 @@ public class AccountService {
   @Qualifier("AccountDaoFeatJpaRepository")
   private final AccountDao dao;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
+  private final AuthenticationRefresher authRefresher;
   
   /**
    * ログインの検証
@@ -97,13 +98,13 @@ public class AccountService {
       return false;
     }
     
-    // 2) ログイン中ユーザー（メール）を取得
+    // ログイン中ユーザー（メール）を取得
     // SecurityContextHolder -> いまのリクエストを処理しているスレッドに紐づく“認証情報（だれがログイン中か）”の置き場所
     //  Spring Security がログイン成功時にここへ Authentication を入れ、各層（Controller/Service 等）から取り出せる
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     String loginEmail = (auth != null ? auth.getName() : null);
 
-    // 3) 更新対象の現行レコードをDBから再取得
+    // 更新対象の現行レコードをDBから再取得
     var currentOpt = dao.findById(account.getId());
     if (currentOpt.isEmpty()) {
       result.reject("notfound", "対象アカウントが存在しません");
@@ -111,7 +112,7 @@ public class AccountService {
     }
     var current = currentOpt.get();
 
-    // 4) 本人チェック：ログインメール と 現行レコードのメール が一致すること
+    // 本人チェック：ログインメール と 現行レコードのメール が一致すること
     if (loginEmail == null || !loginEmail.equals(current.getEmail())) {
       result.reject("forbidden", "自分のアカウントのみ更新できます");
       return false;
@@ -123,14 +124,12 @@ public class AccountService {
       return false;
     }
     
-    // 6) パスワードは温存（UIから消した場合でも上書き破壊しない）
+    // パスワードは温存（UIから消した場合でも上書き破壊しない）
     account.setPassword(current.getPassword());
-    // パスワードの入力エラーを確認
-//    if(result.hasFieldErrors("password")) {
-//      return false;
-//    }
+
     // アカウント情報を更新
     dao.update(account);
+    authRefresher.refreshIfSelf(account.getId());
     return true;
   }
   
@@ -146,7 +145,7 @@ public class AccountService {
   public boolean changeOwnPassword(String email,
                                    PasswordChangeForm form,
                                    BindingResult result) {
-    // 1) 本人のレコードを取得
+    // 本人のレコードを取得
     var accountOpt = dao.findByEmail(email);
     if (accountOpt.isEmpty()) {
       result.reject("notfound", "アカウントが見つかりません");
@@ -154,13 +153,13 @@ public class AccountService {
     }
     var account = accountOpt.get();
 
-    // 2) 現在パスワードの一致チェック（{bcrypt}/{noop} いずれでも matches が面倒見ます）
+    // 現在パスワードの一致チェック(フォームで入力した値とDBから取得した値比較)
     if (!passwordEncoder.matches(form.getCurrentPassword(), account.getPassword())) {
       result.rejectValue("currentPassword", "mismatch.current", "現在のパスワードが正しくありません");
       return false;
     }
 
-    // 3) 新パスワード一致＆差分チェック
+    // 新パスワード一致＆差分チェック
     if (!form.getNewPassword().equals(form.getConfirmPassword())) {
       result.rejectValue("confirmPassword", "mismatch.confirm", "確認用パスワードが一致しません");
       return false;
@@ -170,7 +169,7 @@ public class AccountService {
       return false;
     }
 
-    // 4) ハッシュ化して保存
+    // ハッシュ化して保存
     account.setPassword(passwordEncoder.encode(form.getNewPassword()));
     dao.update(account); 
     return true;
@@ -213,7 +212,8 @@ public class AccountService {
     // 永続化用エンティティに詰め替え
     var account = new AccountDto();
     account.setEmail(user.getEmail());
-    account.setPassword(encoded); // ← BCrypt(60文字)
+    account.setPassword(encoded);
+    account.setRole(Role.USER); // デフォルトで権限をUSERにする
     // アカウントを作成
     dao.create(account);
     return true;

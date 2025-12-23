@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Repository;
 
 import jp.ne.takes.dto.AccountDto;
+import jp.ne.takes.dto.AccountDto.Role;
 
 /**
  * アカウントDAOクラス
@@ -27,9 +28,9 @@ public class AccountDaoFeatMap implements AccountDao {
    * ※ダブルブレース初期化は匿名内部クラスの生成、メモリリークの可能性、シリアル化の問題あり
    */
   private static Map<Integer, AccountDto> accounts = new ConcurrentHashMap<>() {{
-    put(1, new AccountDto(1,"takes@takes.ne.jp","Takes200038"));
-    put(2, new AccountDto(2, "gs_k.igari@takesgrp.info","Takes123456"));
-    put(3, new AccountDto(3, "k.igari@takes.ne.jp","Takes123456"));
+    put(1, new AccountDto(1,"takes@takes.ne.jp","Takes200038",Role.ADMIN));
+    put(2, new AccountDto(2, "gs_k.igari@takesgrp.info","Takes123456",Role.USER));
+    put(3, new AccountDto(3, "k.igari@takes.ne.jp","Takes123456",Role.USER));
   }};
 
   /**

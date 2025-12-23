@@ -1,12 +1,14 @@
 package jp.ne.takes.security;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jp.ne.takes.dto.AccountDto;
+import jp.ne.takes.dto.AccountDto.Role;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -31,13 +33,15 @@ public class AccountPrincipal implements UserDetails {
     private final AccountDto account;
 
     /**
-     * 権限情報を返す（未使用のため空リストを返却）
+     * 権限情報を返す
      * 
-     * @return 空の権限リスト
+     * @return 権限リスト
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+      // DBのROLE文字列をSpring Securityの規約 "ROLE_XXX" に変換
+      Role role = account.getRole() != null ? account.getRole() : Role.USER;
+      return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     /**

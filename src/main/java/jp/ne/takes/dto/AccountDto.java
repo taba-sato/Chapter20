@@ -2,6 +2,8 @@ package jp.ne.takes.dto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,4 +45,10 @@ public class AccountDto {
   /** パスワード */
   @Column
   private String password = "";
+  
+  /** 権限 */
+  public enum Role { USER, ADMIN }
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private Role role = Role.USER;
 }

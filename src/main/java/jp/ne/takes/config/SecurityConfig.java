@@ -2,7 +2,9 @@ package jp.ne.takes.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -30,6 +32,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Configuration // Spring による Java ベースの設定クラスであることを示す
 @EnableWebSecurity // Spring Security を有効化する
+@EnableMethodSecurity //AccountControllerの@PreAuthorize("hasRole('ADMIN')")を有効にする
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -71,8 +74,10 @@ public class SecurityConfig {
        PasswordUpgradeSuccessHandler passwordUpgradeSuccessHandler) throws Exception {  
     http 
       .authorizeHttpRequests(auth -> auth // パスへのアクセス制御を行う
-       // ログイン画面やCSSなどは誰でもアクセス可
+          // ログイン画面やCSSなどは誰でもアクセス可
           .requestMatchers("/", "/login", "/styles.css").permitAll()
+          // 削除処理は管理者のみ（必要に応じてURLを追加）
+          .requestMatchers(HttpMethod.POST, "/account/delete").hasRole("ADMIN")
           // その他すべてのURLは認証が必要
           .anyRequest().authenticated()
       )
@@ -83,7 +88,7 @@ public class SecurityConfig {
           .loginProcessingUrl("/login")
           .usernameParameter("username")
           .passwordParameter("password")
-       // noop→bcrypt変換用のコード。最終的に削除する
+          // noop→bcrypt変換用のコード。最終的に削除する
           .successHandler(passwordUpgradeSuccessHandler)
           // 認証成功後に遷移するページ PasswordUpgradeSuccessHandlerクラス削除後に有効にする
           //.defaultSuccessUrl("/home", true)

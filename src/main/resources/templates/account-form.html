@@ -10,13 +10,13 @@
   <!--/* アカウントの更新・削除画面 */-->
   <form method="post" th:object="${accountDto}" th:action="@{/account/update}">
       <div>
-        <button type="submit">更新</button>
+        <!-- 自分のアカウントのときだけ更新ボタンを表示 -->
+        <!-- ${...}の“中に” *{...}を混在させるとth:ifの解釈失敗でエラー -->
+        <button type="submit" th:if="${#authentication.name == accountDto.email}">更新</button>
         <!-- 削除: このボタンだけ送信先を上書き（POST /account/delete） -->
-        <button type="submit" onclick="return confirm('本当に削除しますか？');" th:formaction="@{/account/delete}">削除</button>
+        <button sec:authorize="hasRole('ADMIN')" type="submit" onclick="return confirm('本当に削除しますか？');" th:formaction="@{/account/delete}">削除</button>
         <!-- キャンセル: GET遷移なのでCSRF不要 -->
-        <a th:href="@{/account/cancel}">
-          <button type="button">キャンセル</button>
-        </a>
+        <a th:href="@{/account/cancel}"><button type="button">キャンセル</button></a>
     </div>
     <div>
       <label for="id">ID</label>

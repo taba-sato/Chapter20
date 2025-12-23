@@ -1,5 +1,6 @@
 package jp.ne.takes.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -148,6 +149,7 @@ public class AccountController {
    *
    * @return "redirect:/account-list"（アカウント一覧画面を表示）
    */
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/account/delete")
   public String delete(@ModelAttribute AccountDto account) {
     accountService.deleteById(account.getId());
