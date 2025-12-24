@@ -8,11 +8,11 @@
 <body>
   <h2>更新・削除</h2>
   <!--/* アカウントの更新・削除画面 */-->
-  <form method="post" th:object="${accountDto}" th:action="@{/account/update}">
+  <form method="post" th:object="${accountUpdateForm}" th:action="@{/account/update}">
       <div>
         <!-- 自分のアカウントのときだけ更新ボタンを表示 -->
         <!-- ${...}の“中に” *{...}を混在させるとth:ifの解釈失敗でエラー -->
-        <button type="submit" th:if="${#authentication.name == accountDto.email}">更新</button>
+        <button type="submit" th:if="${#authentication.name == accountUpdateForm.email}">更新</button>
         <!-- 削除: このボタンだけ送信先を上書き（POST /account/delete） -->
         <button sec:authorize="hasRole('ADMIN')" type="submit" onclick="return confirm('本当に削除しますか？');" th:formaction="@{/account/delete}">削除</button>
         <!-- キャンセル: GET遷移なのでCSRF不要 -->

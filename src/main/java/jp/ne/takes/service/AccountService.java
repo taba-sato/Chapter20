@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import jp.ne.takes.dao.AccountDao;
 import jp.ne.takes.dto.AccountDto;
 import jp.ne.takes.dto.AccountDto.Role;
+import jp.ne.takes.dto.AccountUpdateForm;
 import jp.ne.takes.dto.PasswordChangeForm;
 import jp.ne.takes.dto.User;
 import jp.ne.takes.security.AuthenticationRefresher;
@@ -92,9 +93,12 @@ public class AccountService {
    * @return 成功{@code true}/失敗{@code false}
    */
   @Transactional
-  public boolean isUpdateSuccessful(AccountDto account, BindingResult result) {
+  public boolean isUpdateSuccessful(AccountUpdateForm account, BindingResult result) {
     // メアドの入力エラーを確認
     if(result.hasFieldErrors("email")) {
+      // DBから元のEmailを取得、上書きして戻す
+      var currentOpt = dao.findById(account.getId()).get();
+      account.setEmail(currentOpt.getEmail());
       return false;
     }
     
@@ -123,12 +127,10 @@ public class AccountService {
       result.rejectValue("email", "error.email", "このメールアドレスは既に使用されています");
       return false;
     }
-    
-    // パスワードは温存（UIから消した場合でも上書き破壊しない）
-    account.setPassword(current.getPassword());
 
     // アカウント情報を更新
-    dao.update(account);
+    current.setEmail(account.getEmail());
+    dao.update(current);
     authRefresher.refreshIfSelf(account.getId());
     return true;
   }

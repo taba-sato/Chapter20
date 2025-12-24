@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import jp.ne.takes.dto.AccountDto;
+import jp.ne.takes.dto.AccountUpdateForm;
 import jp.ne.takes.dto.PasswordChangeForm;
 import jp.ne.takes.dto.User;
 import jp.ne.takes.security.AccountPrincipal;
@@ -63,8 +64,11 @@ public class AccountController {
   @GetMapping("/account/{id}")
   public String byId(@PathVariable(name = "id") int id, Model mdl) {
     // IDでアカウントを取得   
-    var accountOpt = accountService.findById(id);
-    mdl.addAttribute("accountDto", accountOpt.get());
+    var accountOpt = accountService.findById(id).get();
+    var form = new AccountUpdateForm();
+    form.setId(accountOpt.getId());
+    form.setEmail(accountOpt.getEmail());
+    mdl.addAttribute("accountUpdateForm", form);
     return "account-form";
   }
 
@@ -73,13 +77,13 @@ public class AccountController {
    * URL: http://localhost:8080/account/update
    * HTTPメソッド: POST
    *
-   * @param accountDto 更新するアカウント情報
+   * @param account 更新するアカウント情報
    * @param result バリデーションの結果
    * @return 成功："redirect:/account-list"（アカウント一覧画面を表示）
    *         失敗："account-form"（アカウント更新画面を表示）
    */
   @PostMapping("/account/update")
-  public String update(@ModelAttribute @Validated AccountDto account, BindingResult result) {
+  public String update(@ModelAttribute @Validated AccountUpdateForm account, BindingResult result) {
     if (!accountService.isUpdateSuccessful(account, result)) {
       // アカウントの更新に失敗
       return "account-form";

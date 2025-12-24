@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 
 import jp.ne.takes.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
-// noop→bcrypt変換用のコード。最終的に削除するクラス
+// noop→bcrypt変換用のコード。最終的に削除する予定のクラス
 @RequiredArgsConstructor
 public class PasswordUpgradeSuccessHandler implements AuthenticationSuccessHandler {
 

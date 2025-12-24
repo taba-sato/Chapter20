@@ -47,7 +47,7 @@ public class SecurityConfig {
   /**
   * 認証プロバイダの定義。
   * 
-  * 認証処理に使用する UserDetailsService と PasswordEncoder を指定。
+  * 認証処理に UserDetailsService と PasswordEncoder を使用するように指定。
   * 
   * @return DaoAuthenticationProviderのインスタンス
   */
@@ -59,7 +59,7 @@ public class SecurityConfig {
     return provider;  // Spring に登録
    }
 
-  // 最終的に削除
+  // 平文パスワードをログイン時に暗号化するメソッド。最終的に削除予定。
   @Bean
   public PasswordUpgradeSuccessHandler passwordUpgradeSuccessHandler(
           AccountRepository accountRepository,
@@ -88,7 +88,7 @@ public class SecurityConfig {
           .loginProcessingUrl("/login")
           .usernameParameter("username")
           .passwordParameter("password")
-          // noop→bcrypt変換用のコード。最終的に削除する
+          // noop→bcrypt変換用のコード。最終的に削除する予定
           .successHandler(passwordUpgradeSuccessHandler)
           // 認証成功後に遷移するページ PasswordUpgradeSuccessHandlerクラス削除後に有効にする
           //.defaultSuccessUrl("/home", true)
@@ -106,21 +106,5 @@ public class SecurityConfig {
       );
 
   return http.build();
-}
-
-//  /**
-//  * 開発中の暫定パスワードエンコーダ（平文で処理）。
-//  * 
-//  * 本番環境では必ず BCryptPasswordEncoder などに切り替えること。
-//  * 
-//  * @return NoOpPasswordEncoderのインスタンス
-//  */
-//  @SuppressWarnings("deprecation")
-//  @Bean
-//  public NoOpPasswordEncoder passwordEncoder() {
-//    return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
-//  }
-
-
-
+ }
 }

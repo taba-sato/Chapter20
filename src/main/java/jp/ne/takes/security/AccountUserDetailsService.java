@@ -32,13 +32,13 @@ public class AccountUserDetailsService implements UserDetailsService {
      * メールアドレスをもとにユーザー情報を取得する。
      * 
      * @param email 入力されたメールアドレス（ユーザー名）
-     * @return Spring Security 用のユーザー情報の型（AccountPrincipal）
+     * @return Spring Security 用のユーザー情報（AccountPrincipal）
      * @throws UsernameNotFoundException アカウントが見つからなかった場合にスロー
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return repository.findByEmail(email)
-                .map(AccountPrincipal::new) //.map(dto -> new AccountPrincipal(dto)) と同じ
+                .map(dto -> new AccountPrincipal(dto))
                 .orElseThrow(() -> new UsernameNotFoundException("ユーザーが存在しません: " + email));
     }
 }

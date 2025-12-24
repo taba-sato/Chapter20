@@ -27,20 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class LoginController {
-  /** アカウントサービス */
-  //private final AccountService accountService; ←Securityで認証するため不要
-  
-  //Spring Security がログイン後に自動で認証情報をセッションに持つので不要
-  /**
-   * Userの生成
-   * 
-   * マッピングアノテーション付きのメソッド実行前に呼び出される
-   * @return Userは自動的にモデルに追加
-   */
-//  @ModelAttribute("user")
-//  public User createUser() {
-//      return new User();
-//  }
 
   /**
    * ハンドラーメソッド
@@ -52,39 +38,9 @@ public class LoginController {
    */
   @GetMapping("/")
   public String index(@RequestParam(name = "error", required = false) String error, Model model) {
-//    if (error != null) {
-//      model.addAttribute("mesg", "メールアドレスまたはパスワードが間違っています");
-//    }
-//  login.htmlでエラー表示を実装
     return "login";
   }
   
-/** Securityが処理するため不要 */
-  /**
-   * ハンドラーメソッド
-   * URL: http://localhost:8080/login
-   * HTTPメソッド: POST
-   * 
-   * @param accountDto AccountDtoオブジェクト
-   * @param mdl Modelオブジェクト
-   * @return "redirect:/home" (ホーム画面を表示)
-   */
-//  @PostMapping("/login")
-//  public String login(@ModelAttribute User user, Model mdl) {
-//    // メアドとパスワードを取得
-//    var email = user.getEmail();
-//    var password = user.getPassword();    
-//    // メアドとパスワードを確認
-//    if(!accountService.isLoginSuccessful(email, password)) {
-//      // ログイン失敗、モデルにメッセージを設定
-//      mdl.addAttribute("mesg", "メールアドレスまたはパスワードが間違っています");
-//      // ビューにログイン画面を設定
-//      return "login";
-//    }
-//    // ログイン成功、ホーム画面にリダイレクト 
-//    return "redirect:/home";
-//  }
-
   /**
    * ハンドラーメソッド
    * URL: http://localhost:8080/home
